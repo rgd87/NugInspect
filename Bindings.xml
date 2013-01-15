@@ -1,0 +1,5 @@
+<Bindings>
+	<Binding name="Inspect" header="NUGINSPECT">
+        	NugInspect:Inspect()
+	</Binding>
+</Bindings>

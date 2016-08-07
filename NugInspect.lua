@@ -74,7 +74,7 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
 		viewBtn:SetWidth(70)
 		viewBtn:SetText("View")
 		viewBtn:ClearAllPoints()
-		viewBtn:SetPoint("BOTTOMRIGHT", InspectPaperDollFrame, "BOTTOMRIGHT", -10, 10)
+		viewBtn:SetPoint("BOTTOMLEFT", InspectPaperDollFrame, "BOTTOMLEFT", 10, 10)
 
         local st = NugInspectServerText
         if not st then

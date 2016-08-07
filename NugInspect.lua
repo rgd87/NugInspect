@@ -70,6 +70,12 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
             InspectGuildText:Hide()
         end
 
+		local viewBtn = InspectPaperDollFrame.ViewButton
+		viewBtn:SetWidth(70)
+		viewBtn:SetText("View")
+		viewBtn:ClearAllPoints()
+		viewBtn:SetPoint("BOTTOMRIGHT", InspectPaperDollFrame, "BOTTOMRIGHT", -10, 10)
+
         local st = NugInspectServerText
         if not st then
             NugInspectServerText = InspectPaperDollFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -87,6 +93,7 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
             InspectSwitchTabs(1)
             PanelTemplates_DisableTab(InspectFrame, 2);
             PanelTemplates_DisableTab(InspectFrame, 3);
+			viewBtn:Hide()
         end
     end)
 
@@ -94,6 +101,7 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
 
     InspectFrame:HookScript("OnShow", function()
         NugInspect:RegisterEvent("MODIFIER_STATE_CHANGED")
+        NugInspect:MODIFIER_STATE_CHANGED()
     end)
     InspectFrame:HookScript("OnHide", function()
         NugInspect:UnregisterEvent("MODIFIER_STATE_CHANGED")
@@ -113,6 +121,33 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
 
 end
 
+-- Construct your saarch pattern based on the existing global string:
+local S_ITEM_LEVEL   = "^" .. gsub(ITEM_LEVEL, "%%d", "(%%d+)")
+local S_ITEM_LEVEL_ALT   = "^" .. gsub(ITEM_LEVEL_ALT, "%%d", "(%%d+)")
+
+-- Create the tooltip:
+local scantip = CreateFrame("GameTooltip", "MyScanningTooltip", nil, "GameTooltipTemplate")
+scantip:SetOwner(UIParent, "ANCHOR_NONE")
+
+local function GetItemLevelFromTooltip(itemLink)
+    -- Pass the item link to the tooltip:
+    scantip:SetHyperlink(itemLink)
+
+    -- Scan the tooltip:
+    for i = 2, scantip:NumLines() do -- Line 1 is always the name so you can skip it.
+        local text = _G["MyScanningTooltipTextLeft"..i]:GetText()
+        if text and text ~= "" then
+            -- local currentUpgradeLevel, maxUpgradeLevel = strmatch(text, S_UPGRADE_LEVEL)
+			local itemLevel = strmatch(text, S_ITEM_LEVEL)
+            if itemLevel then
+                return itemLevel
+            end
+        end
+    end
+end
+
+
+
 
 function NugInspect.MODIFIER_STATE_CHANGED(self, event)
     local unit = InspectFrame.unit;
@@ -123,7 +158,8 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
             if slotID and unit then
                 local itemLink = GetInventoryItemLink(unit, slotID)
                 if itemLink then
-                    local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(itemLink)
+                    -- local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(itemLink)
+					local iLevel = GetItemLevelFromTooltip(itemLink)
                     button.ItemLevelText:SetText(iLevel)
                     button.ItemLevelText:Show()
                 else

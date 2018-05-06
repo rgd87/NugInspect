@@ -1,4 +1,5 @@
 NugInspect = CreateFrame("Frame","NugInspect")
+local NugInspect = NugInspect
 
 NugInspect:SetScript("OnEvent", function(self, event, ...)
 	return self[event](self, event, ...)
@@ -6,7 +7,7 @@ end)
 
 NugInspect:RegisterEvent("ADDON_LOADED")
 
-BINDING_HEADER_NUGINSPECT = "NugInspect"
+_G.BINDING_HEADER_NUGINSPECT = "NugInspect"
 
 function NugInspect:Inspect()
     if InspectFrame and InspectFrame:IsVisible() then

@@ -1,5 +1,5 @@
-## Interface: 70000
+## Interface: 70300
 ## Title: NugInspect
-## Notes: More features to blizzard inspect frame
+## Notes: Adds more features to blizzard inspect frame
 ## Author: d87
 NugInspect.lua

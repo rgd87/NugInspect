@@ -1,5 +1,5 @@
 <Bindings>
-	<Binding name="Inspect" header="NUGINSPECT">
+	<Binding name="Inspect" header="NUGINSPECT" category="ADDONS">
         	NugInspect:Inspect()
 	</Binding>
 </Bindings>

@@ -180,14 +180,13 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
 
     for i=1, 17 do
         local button = NugInspect.SlotToButton[i]
-    -- for button in pairs(self.PaperDollButtons) do
+
         if IsAltKeyDown() and isFriend and isPlayer and (i~=4) then
             local slotID = button:GetID()
             if slotID and unit then
                 local itemLink = GetInventoryItemLink(unit, slotID)
                 local iLevel
                 if itemLink then
-                    -- local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(itemLink)
                     iLevel = GetItemLevelFromTooltip(unit, slotID)--itemLink)
                     
                     if slotID > 16 then
@@ -208,23 +207,13 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
                     button.ItemLevelText:Hide()
                 end
 
-                -- if slotID == 16 or slotID == 17 then
-                --     local isArtifact = GetInventoryItemQuality(unit, slotID) == 6
-
-                --     if isArtifact then
-                --         local mhLink = GetInventoryItemLink(unit, INVSLOT_MAINHAND)
-                --         local ohLink = GetInventoryItemLink(unit, INVSLOT_OFFHAND)
-                --         local mhLevel = mhLink and GetItemLevelFromTooltip(unit, INVSLOT_MAINHAND) or 0
-                --         local ohLevel = ohLink and GetItemLevelFromTooltip(unit, INVSLOT_OFFHAND) or 0
-                --         iLevel = math.max(mhLevel, ohLevel)
-                    if slotID == 17 and not itemLink then
-                        itemLink = GetInventoryItemLink(unit, INVSLOT_MAINHAND)
-                        if itemLink and IsTwoHanded(itemLink) then
-                            iLevel = GetItemLevelFromTooltip(unit, INVSLOT_MAINHAND)
-                        end
+                if slotID == 17 and not itemLink then
+                    itemLink = GetInventoryItemLink(unit, INVSLOT_MAINHAND)
+                    if itemLink and IsTwoHanded(itemLink) then
+                        iLevel = GetItemLevelFromTooltip(unit, INVSLOT_MAINHAND)
                     end
-                -- end
-                -- local inc = CheckItemForAIL(unit, slotID, iLevel)
+                end
+
                 if slotID ~= 4 and slotID ~=19 then
                     TotalItemLevel = TotalItemLevel + iLevel
                     TotalItemCount = TotalItemCount + 1

@@ -178,6 +178,11 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
     local TotalItemLevel = 0
     local TotalItemCount = 0
 
+    if isFriend and isPlayer then
+        -- to start querying artficat item level when frame is first shown
+        GetItemLevelFromTooltip(unit, INVSLOT_MAINHAND)
+    end
+
     for i=1, 17 do
         local button = NugInspect.SlotToButton[i]
 

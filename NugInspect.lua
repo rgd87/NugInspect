@@ -76,7 +76,8 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
 		viewBtn:SetWidth(70)
 		viewBtn:SetText("View")
 		viewBtn:ClearAllPoints()
-		viewBtn:SetPoint("BOTTOMLEFT", InspectPaperDollFrame, "BOTTOMLEFT", 10, 10)
+        viewBtn:SetPoint("BOTTOMLEFT", InspectPaperDollFrame, "BOTTOMLEFT", 10, 10)
+        viewBtn:Show()
 
         local st = NugInspectServerText
         if not st then
@@ -106,7 +107,7 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
             InspectSwitchTabs(1)
             PanelTemplates_DisableTab(InspectFrame, 2);
             PanelTemplates_DisableTab(InspectFrame, 3);
-			viewBtn:Hide()
+            viewBtn:Hide()
         end
     end)
 

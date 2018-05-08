@@ -233,7 +233,7 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
     local ailt = InspectModelFrame.NugInspectAILText
     if ailt then
         if TotalItemCount > 0 then
-            local AverageItemLevel = math.floor(TotalItemLevel/TotalItemCount + 0.5)
+            local AverageItemLevel = math.floor(TotalItemLevel/TotalItemCount)
 
             ailt:Show()
             ailt:SetFormattedText("AIL: %d", AverageItemLevel)

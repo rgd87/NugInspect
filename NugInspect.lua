@@ -195,7 +195,7 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
                 if itemLink then
                     iLevel = GetItemLevelFromTooltip(unit, slotID)--itemLink)
                     
-                    if slotID > 16 then
+                    if slotID >= 16 then
                         local isArtifact = GetInventoryItemQuality(unit, slotID) == 6
                         if isArtifact then
                             local mhLink = GetInventoryItemLink(unit, INVSLOT_MAINHAND)

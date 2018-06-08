@@ -164,10 +164,12 @@ end
 
 
 local IsTwoHanded = function(itemLink)
-    local _, _, _, itemEquipLoc = GetItemInfoInstant(itemLink)
+    local itemEquipLoc = Item:CreateFromItemLink(itemLink):GetInventoryTypeName()
+    -- local _, _, _, itemEquipLoc = GetItemInfoInstant(itemLink)
     return itemEquipLoc == "INVTYPE_2HWEAPON"
 end
 
+local Item = Item
 local INVSLOT_MAINHAND = INVSLOT_MAINHAND
 local INVSLOT_OFFHAND = INVSLOT_OFFHAND
 function NugInspect.MODIFIER_STATE_CHANGED(self, event)
@@ -193,15 +195,16 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
                 local itemLink = GetInventoryItemLink(unit, slotID)
                 local iLevel
                 if itemLink then
-                    iLevel = GetItemLevelFromTooltip(unit, slotID)--itemLink)
+                    iLevel = Item:CreateFromItemLink(itemLink):GetCurrentItemLevel()
+                    -- iLevel = GetItemLevelFromTooltip(unit, slotID)--itemLink)
                     
                     if slotID >= 16 then
                         local isArtifact = GetInventoryItemQuality(unit, slotID) == 6
                         if isArtifact then
                             local mhLink = GetInventoryItemLink(unit, INVSLOT_MAINHAND)
                             local ohLink = GetInventoryItemLink(unit, INVSLOT_OFFHAND)
-                            local mhLevel = mhLink and GetItemLevelFromTooltip(unit, INVSLOT_MAINHAND) or 0
-                            local ohLevel = ohLink and GetItemLevelFromTooltip(unit, INVSLOT_OFFHAND) or 0
+                            local mhLevel = mhLink and Item:CreateFromItemLink(mhLink):GetCurrentItemLevel() or 0
+                            local ohLevel = ohLink and Item:CreateFromItemLink(ohLink):GetCurrentItemLevel() or 0
                             iLevel = math.max(mhLevel, ohLevel)
                         end
                     end                   
@@ -216,7 +219,7 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
                 if slotID == 17 and not itemLink then
                     itemLink = GetInventoryItemLink(unit, INVSLOT_MAINHAND)
                     if itemLink and IsTwoHanded(itemLink) then
-                        iLevel = GetItemLevelFromTooltip(unit, INVSLOT_MAINHAND)
+                        iLevel = Item:CreateFromItemLink(itemLink):GetCurrentItemLevel()
                     end
                 end
 

@@ -170,6 +170,10 @@ end
 
 local INVSLOT_MAINHAND = INVSLOT_MAINHAND
 local INVSLOT_OFFHAND = INVSLOT_OFFHAND
+local INVSLOT_HEAD = 1
+local INVSLOT_NECK = 2
+local INVSLOT_SHOULDER = 3
+local INVSLOT_CHEST = 5
 function NugInspect.MODIFIER_STATE_CHANGED(self, event)
     local unit = InspectFrame.unit;
 
@@ -181,7 +185,11 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
 
     if isFriend and isPlayer then
         -- to start querying artficat item level when frame is first shown
-        GetItemLevelFromTooltip(unit, INVSLOT_MAINHAND)
+        -- GetItemLevelFromTooltip(unit, INVSLOT_MAINHAND)
+        GetItemLevelFromTooltip(unit, INVSLOT_HEAD)
+        GetItemLevelFromTooltip(unit, INVSLOT_NECK)
+        GetItemLevelFromTooltip(unit, INVSLOT_SHOULDER)
+        GetItemLevelFromTooltip(unit, INVSLOT_CHEST)
     end
 
     for i=1, 17 do

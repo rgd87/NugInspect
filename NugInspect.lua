@@ -8,6 +8,8 @@ end)
 
 NugInspect:RegisterEvent("ADDON_LOADED")
 
+local isClassic = select(4,GetBuildInfo()) <= 19999
+
 _G.BINDING_HEADER_NUGINSPECT = "NugInspect"
 
 function NugInspect:Inspect()
@@ -44,6 +46,14 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
         return SetPaperDollBackground1(model, unit)
     end
 
+    if isClassic then
+        if not InspectLevelText._SetFormattedText then InspectLevelText._SetFormattedText = InspectLevelText.SetFormattedText end
+        InspectLevelText.SetFormattedText = function(self, pattern, level, race, classDisplayName)
+            race = race or ""
+            return self:_SetFormattedText(pattern, level, race, classDisplayName)
+        end
+    end
+
     -- InspectFrame:SetScript("OnEvent", function (self, event, unit, ...)
     -- -- InspectFrame:HookScript("OnEvent", function (self, event, unit, ...)
     --     if ( event == "PLAYER_TARGET_CHANGED" or event == "GROUP_ROSTER_UPDATE" ) then
@@ -72,12 +82,16 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
             InspectGuildText:Hide()
         end
 
-		local viewBtn = InspectPaperDollFrame.ViewButton
-		viewBtn:SetWidth(70)
-		viewBtn:SetText("View")
-		viewBtn:ClearAllPoints()
-        viewBtn:SetPoint("BOTTOMLEFT", InspectPaperDollFrame, "BOTTOMLEFT", 10, 10)
-        viewBtn:Show()
+        if InspectPaperDollFrame.ViewButton then
+            local viewBtn = InspectPaperDollFrame.ViewButton
+            viewBtn:SetWidth(70)
+            viewBtn:SetText("View")
+            viewBtn:ClearAllPoints()
+            viewBtn:SetPoint("BOTTOMLEFT", InspectPaperDollFrame, "BOTTOMLEFT", 10, 10)
+            viewBtn:Show()
+        end
+
+        
 
         local st = NugInspectServerText
         if not st then
@@ -106,8 +120,8 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
         if not UnitIsPlayer(unit) or not UnitIsFriend(unit, "player") then
             InspectSwitchTabs(1)
             PanelTemplates_DisableTab(InspectFrame, 2);
-            PanelTemplates_DisableTab(InspectFrame, 3);
-            viewBtn:Hide()
+            if not isClassic then PanelTemplates_DisableTab(InspectFrame, 3); end
+            if InspectPaperDollFrame.ViewButton then InspectPaperDollFrame.ViewButton:Hide() end
         end
     end)
 
@@ -229,7 +243,7 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
                 end
 
                 if slotID ~= 4 and slotID ~=19 then
-                    TotalItemLevel = TotalItemLevel + iLevel
+                    TotalItemLevel = TotalItemLevel + (iLevel or 0)
                     TotalItemCount = TotalItemCount + 1
                 end
             end

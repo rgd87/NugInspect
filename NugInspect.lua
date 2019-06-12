@@ -91,7 +91,7 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
             viewBtn:Show()
         end
 
-        
+
 
         local st = NugInspectServerText
         if not st then
@@ -216,7 +216,7 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
                 local iLevel
                 if itemLink then
                     iLevel = GetItemLevelFromTooltip(unit, slotID)--itemLink)
-                    
+
                     if slotID >= 16 then
                         local isArtifact = GetInventoryItemQuality(unit, slotID) == 6
                         if isArtifact then
@@ -226,7 +226,7 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
                             local ohLevel = ohLink and GetItemLevelFromTooltip(unit, INVSLOT_OFFHAND) or 0
                             iLevel = math.max(mhLevel, ohLevel)
                         end
-                    end                   
+                    end
 
                     button.ItemLevelText:SetText(iLevel)
                     button.ItemLevelText:Show()
@@ -255,7 +255,8 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
     local ailt = InspectModelFrame.NugInspectAILText
     if ailt then
         if TotalItemCount > 0 then
-            local AverageItemLevel = math.floor(TotalItemLevel/TotalItemCount)
+            -- local AverageItemLevel = math.floor(TotalItemLevel/TotalItemCount)
+            local AverageItemLevel = C_PaperDollInfo.GetInspectItemLevel(unit)
 
             ailt:Show()
             ailt:SetFormattedText("AIL: %d", AverageItemLevel)

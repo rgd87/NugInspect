@@ -163,20 +163,29 @@ local S_ITEM_LEVEL_ALT   = "^" .. gsub(ITEM_LEVEL_ALT, "%%d", "(%%d+)")
 local scantip = CreateFrame("GameTooltip", "MyScanningTooltip", nil, "GameTooltipTemplate")
 scantip:SetOwner(UIParent, "ANCHOR_NONE")
 
-local function GetItemLevelFromTooltip(unit, slotID)
-    -- Pass the item link to the tooltip:
-    scantip:SetInventoryItem(unit, slotID)
+local GetItemLevelFromTooltip
+if not isClassic then
+    GetItemLevelFromTooltip = function(unit, slotID)
+        -- Pass the item link to the tooltip:
+        scantip:SetInventoryItem(unit, slotID)
 
-    -- Scan the tooltip:
-    for i = 2, scantip:NumLines() do -- Line 1 is always the name so you can skip it.
-        local text = _G["MyScanningTooltipTextLeft"..i]:GetText()
-        if text and text ~= "" then
-            -- local currentUpgradeLevel, maxUpgradeLevel = strmatch(text, S_UPGRADE_LEVEL)
-            local itemLevel = strmatch(text, S_ITEM_LEVEL)
-            if itemLevel then
-                return itemLevel
+        -- Scan the tooltip:
+        for i = 2, scantip:NumLines() do -- Line 1 is always the name so you can skip it.
+            local text = _G["MyScanningTooltipTextLeft"..i]:GetText()
+            if text and text ~= "" then
+                -- local currentUpgradeLevel, maxUpgradeLevel = strmatch(text, S_UPGRADE_LEVEL)
+                local itemLevel = strmatch(text, S_ITEM_LEVEL)
+                if itemLevel then
+                    return itemLevel
+                end
             end
         end
+    end
+else
+    GetItemLevelFromTooltip = function(unit, slotID)
+        local link = GetInventoryItemLink(unit, slotID)
+        local itemName, itemLink, itemRarity, itemLevel, itemMinLevel = GetItemInfo(link)
+        return itemLevel or 0
     end
 end
 
@@ -192,6 +201,7 @@ local INVSLOT_HEAD = 1
 local INVSLOT_NECK = 2
 local INVSLOT_SHOULDER = 3
 local INVSLOT_CHEST = 5
+local MAX_INVENTORY_SLOTS = isClassic and 18 or 17
 function NugInspect.MODIFIER_STATE_CHANGED(self, event)
     local unit = InspectFrame.unit;
 
@@ -210,7 +220,7 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
         GetItemLevelFromTooltip(unit, INVSLOT_CHEST)
     end
 
-    for i=1, 17 do
+    for i=1, MAX_INVENTORY_SLOTS do
         local button = NugInspect.SlotToButton[i]
 
         if IsAltKeyDown() and isFriend and isPlayer and (i~=4) then

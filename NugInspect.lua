@@ -17,7 +17,7 @@ function NugInspect:Inspect()
         HideUIPanel(InspectFrame)
     else
         if UnitExists("target") then
-            if UnitIsPlayer("target") and not UnitIsEnemy("player", "target") then
+            if UnitIsPlayer("target") and CheckInteractDistance("target", 1) and not UnitIsEnemy("player", "target") then
                 InspectUnit("target")
             else
                 if not InspectFrame then
@@ -184,8 +184,11 @@ if not isClassic then
 else
     GetItemLevelFromTooltip = function(unit, slotID)
         local link = GetInventoryItemLink(unit, slotID)
-        local itemName, itemLink, itemRarity, itemLevel, itemMinLevel = GetItemInfo(link)
-        return itemLevel or 0
+        if link then
+            local itemName, itemLink, itemRarity, itemLevel, itemMinLevel = GetItemInfo(link)
+            return itemLevel or 0
+        end
+        return 0
     end
 end
 

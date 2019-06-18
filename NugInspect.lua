@@ -259,8 +259,12 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
     local ailt = InspectModelFrame.NugInspectAILText
     if ailt then
         if TotalItemCount > 0 then
-            -- local AverageItemLevel = math.floor(TotalItemLevel/TotalItemCount)
-            local AverageItemLevel = C_PaperDollInfo.GetInspectItemLevel(unit)
+            local AverageItemLevel
+            if isClassic then
+                AverageItemLevel = math.floor(TotalItemLevel/TotalItemCount)
+            else
+                AverageItemLevel = C_PaperDollInfo.GetInspectItemLevel(unit)
+            end
 
             ailt:Show()
             ailt:SetFormattedText("AIL: %d", AverageItemLevel)

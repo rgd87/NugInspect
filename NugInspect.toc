@@ -4,6 +4,5 @@
 ## Author: d87
 ## Version: @project-version@
 
-## X-WoWI-ID: 24631
 
 NugInspect.lua

@@ -50,7 +50,11 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
         if not InspectLevelText._SetFormattedText then InspectLevelText._SetFormattedText = InspectLevelText.SetFormattedText end
         InspectLevelText.SetFormattedText = function(self, pattern, level, race, classDisplayName)
             race = race or ""
-            return self:_SetFormattedText(pattern, level, race, classDisplayName)
+            if type(level) == "string" then
+                return self:_SetFormattedText("Level %s %s %s", level, race, classDisplayName)
+            else
+                return self:_SetFormattedText(pattern, level, race, classDisplayName)
+            end
         end
     end
 

@@ -1,3 +1,4 @@
-### 1.13.1:
+### 8.2.0:
 
-- Initial classic compatible version
+- now can inspect out of range friendly targets
+- Using new 8.2 API function for AIL

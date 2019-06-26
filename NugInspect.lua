@@ -229,7 +229,7 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
                 end
 
                 if slotID ~= 4 and slotID ~=19 then
-                    TotalItemLevel = TotalItemLevel + iLevel
+                    TotalItemLevel = TotalItemLevel + (iLevel or 0)
                     TotalItemCount = TotalItemCount + 1
                 end
             end

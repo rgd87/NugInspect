@@ -1,9 +1,8 @@
-## Interface: 80000
+## Interface: 80200
 ## Title: NugInspect
 ## Notes: Adds more features to blizzard inspect frame
 ## Author: d87
 ## Version: @project-version@
 
-## X-WoWI-ID: 24631
 
 NugInspect.lua

@@ -8,6 +8,8 @@ end)
 
 NugInspect:RegisterEvent("ADDON_LOADED")
 
+local isClassic = select(4,GetBuildInfo()) <= 19999
+
 _G.BINDING_HEADER_NUGINSPECT = "NugInspect"
 
 function NugInspect:Inspect()
@@ -15,7 +17,7 @@ function NugInspect:Inspect()
         HideUIPanel(InspectFrame)
     else
         if UnitExists("target") then
-            if UnitIsPlayer("target") and not UnitIsEnemy("player", "target") then
+            if UnitIsPlayer("target") and CheckInteractDistance("target", 1) and not UnitIsEnemy("player", "target") then
                 InspectUnit("target")
             else
                 if not InspectFrame then
@@ -42,6 +44,18 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
     SetPaperDollBackground = function(model, unit)
         if not UnitRace(unit) then unit = "player" end
         return SetPaperDollBackground1(model, unit)
+    end
+
+    if isClassic then
+        if not InspectLevelText._SetFormattedText then InspectLevelText._SetFormattedText = InspectLevelText.SetFormattedText end
+        InspectLevelText.SetFormattedText = function(self, pattern, level, race, classDisplayName)
+            race = race or ""
+            if type(level) == "string" then
+                return self:_SetFormattedText("Level %s %s %s", level, race, classDisplayName)
+            else
+                return self:_SetFormattedText(pattern, level, race, classDisplayName)
+            end
+        end
     end
 
     -- InspectFrame:SetScript("OnEvent", function (self, event, unit, ...)
@@ -72,12 +86,16 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
             InspectGuildText:Hide()
         end
 
-		local viewBtn = InspectPaperDollFrame.ViewButton
-		viewBtn:SetWidth(70)
-		viewBtn:SetText("View")
-		viewBtn:ClearAllPoints()
-        viewBtn:SetPoint("BOTTOMLEFT", InspectPaperDollFrame, "BOTTOMLEFT", 10, 10)
-        viewBtn:Show()
+        if InspectPaperDollFrame.ViewButton then
+            local viewBtn = InspectPaperDollFrame.ViewButton
+            viewBtn:SetWidth(70)
+            viewBtn:SetText("View")
+            viewBtn:ClearAllPoints()
+            viewBtn:SetPoint("BOTTOMLEFT", InspectPaperDollFrame, "BOTTOMLEFT", 10, 10)
+            viewBtn:Show()
+        end
+
+
 
         local st = NugInspectServerText
         if not st then
@@ -106,8 +124,8 @@ function NugInspect.ADDON_LOADED(self,event,arg1)
         if not UnitIsPlayer(unit) or not UnitIsFriend(unit, "player") then
             InspectSwitchTabs(1)
             PanelTemplates_DisableTab(InspectFrame, 2);
-            PanelTemplates_DisableTab(InspectFrame, 3);
-            viewBtn:Hide()
+            if not isClassic then PanelTemplates_DisableTab(InspectFrame, 3); end
+            if InspectPaperDollFrame.ViewButton then InspectPaperDollFrame.ViewButton:Hide() end
         end
     end)
 
@@ -145,20 +163,32 @@ local S_ITEM_LEVEL_ALT   = "^" .. gsub(ITEM_LEVEL_ALT, "%%d", "(%%d+)")
 local scantip = CreateFrame("GameTooltip", "MyScanningTooltip", nil, "GameTooltipTemplate")
 scantip:SetOwner(UIParent, "ANCHOR_NONE")
 
-local function GetItemLevelFromTooltip(unit, slotID)
-    -- Pass the item link to the tooltip:
-    scantip:SetInventoryItem(unit, slotID)
+local GetItemLevelFromTooltip
+if not isClassic then
+    GetItemLevelFromTooltip = function(unit, slotID)
+        -- Pass the item link to the tooltip:
+        scantip:SetInventoryItem(unit, slotID)
 
-    -- Scan the tooltip:
-    for i = 2, scantip:NumLines() do -- Line 1 is always the name so you can skip it.
-        local text = _G["MyScanningTooltipTextLeft"..i]:GetText()
-        if text and text ~= "" then
-            -- local currentUpgradeLevel, maxUpgradeLevel = strmatch(text, S_UPGRADE_LEVEL)
-            local itemLevel = strmatch(text, S_ITEM_LEVEL)
-            if itemLevel then
-                return itemLevel
+        -- Scan the tooltip:
+        for i = 2, scantip:NumLines() do -- Line 1 is always the name so you can skip it.
+            local text = _G["MyScanningTooltipTextLeft"..i]:GetText()
+            if text and text ~= "" then
+                -- local currentUpgradeLevel, maxUpgradeLevel = strmatch(text, S_UPGRADE_LEVEL)
+                local itemLevel = strmatch(text, S_ITEM_LEVEL)
+                if itemLevel then
+                    return itemLevel
+                end
             end
         end
+    end
+else
+    GetItemLevelFromTooltip = function(unit, slotID)
+        local link = GetInventoryItemLink(unit, slotID)
+        if link then
+            local itemName, itemLink, itemRarity, itemLevel, itemMinLevel = GetItemInfo(link)
+            return itemLevel or 0
+        end
+        return 0
     end
 end
 
@@ -174,6 +204,7 @@ local INVSLOT_HEAD = 1
 local INVSLOT_NECK = 2
 local INVSLOT_SHOULDER = 3
 local INVSLOT_CHEST = 5
+local MAX_INVENTORY_SLOTS = isClassic and 18 or 17
 function NugInspect.MODIFIER_STATE_CHANGED(self, event)
     local unit = InspectFrame.unit;
 
@@ -192,7 +223,7 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
         GetItemLevelFromTooltip(unit, INVSLOT_CHEST)
     end
 
-    for i=1, 17 do
+    for i=1, MAX_INVENTORY_SLOTS do
         local button = NugInspect.SlotToButton[i]
 
         if IsAltKeyDown() and isFriend and isPlayer and (i~=4) then
@@ -202,7 +233,7 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
                 local iLevel
                 if itemLink then
                     iLevel = GetItemLevelFromTooltip(unit, slotID)--itemLink)
-                    
+
                     if slotID >= 16 then
                         local isArtifact = GetInventoryItemQuality(unit, slotID) == 6
                         if isArtifact then
@@ -212,7 +243,7 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
                             local ohLevel = ohLink and GetItemLevelFromTooltip(unit, INVSLOT_OFFHAND) or 0
                             iLevel = math.max(mhLevel, ohLevel)
                         end
-                    end                   
+                    end
 
                     button.ItemLevelText:SetText(iLevel)
                     button.ItemLevelText:Show()
@@ -241,7 +272,12 @@ function NugInspect.MODIFIER_STATE_CHANGED(self, event)
     local ailt = InspectModelFrame.NugInspectAILText
     if ailt then
         if TotalItemCount > 0 then
-            local AverageItemLevel = math.floor(TotalItemLevel/TotalItemCount)
+            local AverageItemLevel
+            if isClassic then
+                AverageItemLevel = math.floor(TotalItemLevel/TotalItemCount)
+            else
+                AverageItemLevel = C_PaperDollInfo.GetInspectItemLevel(unit)
+            end
 
             ailt:Show()
             ailt:SetFormattedText("AIL: %d", AverageItemLevel)
